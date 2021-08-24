@@ -11,9 +11,9 @@
 ***
 ## process output
 
-* **vendor** ![vendor](vendor.png)
-* **driver**![driver](driver.png)
-* **caps**![caps](caps.png)
+* **vendor** ![vendor](ven1.png)
+* **driver**![driver](dev1.png)
+* **caps**![caps](cap1.png)
 
 ***
 

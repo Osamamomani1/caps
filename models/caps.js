@@ -2,11 +2,14 @@
 
 
 require('dotenv').config();
+const uuid = require('uuid').v4;
 const port=process.env.PORT || 8000;
 const io=require('socket.io')(port);
 const caps=io.of('/caps')
 
-
+const msgQueue = {
+    chores : {}
+}
 
 let time = new Date()
 
@@ -18,31 +21,39 @@ caps.on('connection',socket=>{
     console.log('CONNECTED SUCCESSFULLY ',socket.id);
 
     socket.on('pickup',payload=>{
-        console.log('event:',{
-            event:'pickup',
-            time:time,
-            payload:payload
-        });
-        caps.emit('driverPickup',payload);
+        console.log("adding a new task ....")
+        const id = uuid();
+        console.log("id ====> ", id)
+        msgQueue.chores[id] = payload;
+        socket.emit('added', payload); // telling the parent a task was added
+        caps.emit('driverPickup',{id: id, payload: msgQueue.chores[id]});
+        console.log("after add msgQueue ========> ", msgQueue)
     });
 
-    socket.on('transit',payload=>{
-        console.log('event:',{
-            event:'transit',
-            time:time,
-            payload:payload
+    socket.on('get_all', ()=> {
+        console.log("get_all : driver wants to get its msgs ")
+        Object.keys(msgQueue.chores).forEach(id=> {
+            socket.emit('driverPickup', {id: id, payload: msgQueue.chores[id] })
         });
-        caps.emit('driverTransit',payload);
     });
 
-    socket.on('deleverd',payload=>{
+    socket.on('received',msg=>{
+        console.log("received on queue will remove it ...")
+        // he child confirmed receiving , remove from queue
+        delete msgQueue.chores[msg.id];
+        console.log("after delete msgQueue @@@@@@@@@@ ", msgQueue)
+        caps.emit('driverTransit',msg);
+    });
+
+
+    socket.on('deleverd',msg=>{
         console.log('event:',{
             event:'deleverd',
             time:time,
-            payload:payload
+            msg:msg
         });
-        caps.emit('deleverd',payload);
-        caps.emit('vendorDileverd',payload);
+        caps.emit('deleverd',msg);
+        caps.emit('vendorDileverd',msg);
     });
 
 
