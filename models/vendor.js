@@ -17,9 +17,12 @@ setInterval(() => {
         socket.emit('pickup',customerOrder);
 }, 1500);
 
+socket.on('added', payload=> {
+    console.log("Thank you for adding : ", payload , " to the queue");
+});
 
-
-socket.on('vendorDileverd',payload=>{
-    console.log(`thank you for delivering ${payload.orderId}`);
+socket.on('vendorDileverd',msg=>{
+    console.log(`thank you for delivering ${msg.id}`);
 
 })
+

@@ -5,20 +5,20 @@ const io=require('socket.io-client');
 const HOST=process.env.HOST || 'http://localhost:8000';
 const socket=io.connect(`${HOST}/caps`);
 
+socket.emit('get_all');
 
-
-socket.on('driverPickup', payload=>{
+socket.on('driverPickup', msg=>{
     setTimeout(()=>{
-        console.log(`DRIVER: picked up ${payload.orderId}`);
-        socket.emit('transit',payload);
+        console.log('DRIVER: picked up this msg :',msg.id);
+        socket.emit('received',msg);
     },5000);
 });
 
 
-socket.on('driverTransit',payload=>{
+socket.on('driverTransit',msg=>{
     setTimeout(()=>{
-        console.log(`DRIVER: delivered  up ${payload.orderId}`);
-        socket.emit('deleverd',payload);
+        console.log(`DRIVER: delivered  up ${msg.id}`);
+        socket.emit('deleverd',msg);
         
     },3000)
 });
